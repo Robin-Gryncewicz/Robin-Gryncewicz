@@ -1,4 +1,6 @@
 name: GitHub Actions Demo
+permissions:
+  contents: read
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
