@@ -9,12 +9,8 @@
 
 # About
 
----
-marp: true
----
 
-Spawned in 1981, Full Stack Software Engineering since 2001 - <p id="date1"></p>) [Senior]
-
+Spawned in 1981, Full Stack Software Engineering for AutoScout24 Belgium, Luxemburg, France and Gernmany
 
 <script>
     const now = new Date()
