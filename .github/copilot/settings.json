@@ -1,15 +1,16 @@
 {
-  "autocomplete": {
-    "enabled": true,
-    "inline_suggestions": true
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": true,
+    "plaintext": true,
+    "markdown": true,
+    "typescript": true,
+    "javascript": true
   },
-  "suggestions": {
-    "enable_context_based": true,
-    "enable_git_context": true,
-    "enable_multi_file": true
-  },
-  "advanced": {
-    "tab_completion": true,
-    "inline_completion_delay": 100
+  "editor.inlineSuggest.enabled": true,
+  "editor.suggestSelection": "first",
+  "github.copilot.advanced": {
+    "inlineSuggest.enable": true,
+    "listCount": 10
   }
 }
