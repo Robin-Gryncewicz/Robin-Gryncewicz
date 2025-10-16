@@ -1,17 +1,30 @@
-# Robin-Gryncewicz
 
-Welcome to the **Robin-Gryncewicz** repository! 
+
+# Welcome to the **Uruboros** repository! 
 
 ## Table of Contents
 - <a>About</a>
 - <a>Contributing</a>
 - <a>License</a>
 
-## About
-Who am I
+# About
 
-## Contributing
+---
+marp: true
+---
+
+Spawned in 1981, Full Stack Software Engineering since 2001 - <p id="date1"></p>) [Senior]
+
+
+<script>
+    const now = new Date()
+    document.getElementById("date1").innerHTML = now;
+    document.getElementById("date2").innerHTML = now.toLocaleDateString("en-US");
+    document.getElementById("date3").innerHTML = now.toLocaleDateString("en-US", {weekday: 'long'});
+</script>
+
+# Contributing
 Contributions are welcome! Please open an issue or submit a pull request for improvements or suggestions.
 
-## License
+# License
 This project is licensed under the MIT License.
