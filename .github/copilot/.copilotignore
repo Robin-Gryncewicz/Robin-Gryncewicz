@@ -1,0 +1,6 @@
+# Files to exclude from Copilot suggestions
+node_modules/
+dist/
+build/
+*.log
+*.lock
