@@ -1,9 +1,3 @@
-[![Slack Channel](https://img.shields.io/badge/slack-ues--creation--api-yellow.svg?logo=slack)](https://autoscout24.slack.com/app_redirect?channel=ues-creation-api) 
-
-[![Build Status](https://ues-creation-api.fizz.services.as24.tech/buildStatus/icon?job=as24-belgium-delta2api-ftpserver/master)](https://ues-creation-api.fizz.services.as24.tech/job/as24-belgium-delta2api-ftpserver/job/master/)
-[![Build Status](https://ues-creation-api.fizz.services.as24.tech/buildStatus/icon?job=as24-belgium-delta2api-ftpserver/master)](https://ues-creation-api.fizz.services.as24.tech/job/as24-belgium-leadservice/job/master/)
-
-
 
 ### Welcome to the **Uruboros** repository! 
 
