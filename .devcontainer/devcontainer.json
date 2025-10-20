@@ -1,0 +1,24 @@
+{
+  "name": "TypeScript Development",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:18",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "github.copilot.enable": {
+          "*": true,
+          "yaml": true,
+          "plaintext": true,
+          "markdown": true
+        },
+        "editor.inlineSuggest.enabled": true,
+        "editor.suggestSelection": "first"
+      }
+    }
+  }
+}
