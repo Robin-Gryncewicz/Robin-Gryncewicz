@@ -1,0 +1,19 @@
+{
+	"github": {
+		"command": "docker",
+		"args": [
+			"run",
+			"-i",
+			"--rm",
+			"-e",
+			${{ secrets.SECRET_NAME }},
+			"-e",
+			"GITHUB_HOST",
+			"ghcr.io/github/github-mcp-server"
+		],
+		"env": {
+			"GITHUB_PERSONAL_ACCESS_TOKEN": "${input:github_token}",
+			"GITHUB_HOST": "https://<your GHES or ghe.com domain name>"
+		}
+	}
+}
