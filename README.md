@@ -1,6 +1,6 @@
-# Robin-Gryncewicz
+# Uruboros
 
-Welcome to the **Robin-Gryncewicz** repository! 
+Welcome to the **Uruboros** repository! 
 
 ## Table of Contents
 - <a>About</a>
