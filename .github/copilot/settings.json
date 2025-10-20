@@ -1,0 +1,15 @@
+{
+  "autocomplete": {
+    "enabled": true,
+    "inline_suggestions": true
+  },
+  "suggestions": {
+    "enable_context_based": true,
+    "enable_git_context": true,
+    "enable_multi_file": true
+  },
+  "advanced": {
+    "tab_completion": true,
+    "inline_completion_delay": 100
+  }
+}
