@@ -1,7 +1,7 @@
-name: GitHub Actions
+name: GitHub Actions Demo
 permissions:
   contents: read
-run-name: ${{ github.actor }} running GitHub Actions 🚀
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
   Explore-GitHub-Actions:
