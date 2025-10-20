@@ -1,0 +1,19 @@
+updateBranch: true
+deleteBranchAfterMerge: true
+reportStatus: true
+mergeMethod: squash
+
+minApprovals:
+  COLLABORATOR: 0
+  NONE: 0
+
+maxRequestedChanges:
+  NONE: 0
+
+blockingLabels:
+  - blocked
+
+rules:
+  - requiredLabels: [javascript, dependencies] # s24-base docker image PRs
+    minApprovals:
+      NONE: 0  # Ensure no approvals are needed
