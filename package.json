@@ -11,6 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ftpd": "^0.2.16"
+    "aws-sdk": "^2.1692.0",
+    "ftpd": "^0.2.16",
+    "ipaddr.js": "^2.2.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.0"
   }
 }
