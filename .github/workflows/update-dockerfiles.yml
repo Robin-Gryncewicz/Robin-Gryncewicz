@@ -1,0 +1,87 @@
+name: Update dockerfile tags
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  upgradeDockerfiles:
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY_ID: "038571482621"
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: master
+      - name: Assume AWS role
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::241636974745:role/gh-actions-access
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registries: "038571482621"
+      - name: Upgrade Docker image version if required
+        run: |
+          git fetch origin
+          for BRANCH in "typescript.web.express.cdk" "java.kafka.cdk" "typescript.web.nextjs.cdk"
+          do
+            git checkout --force origin/${BRANCH} -b dockerfile/${BRANCH}
+
+            # Check if we even have Dockerfile
+            if [[ ! -f Dockerfile ]]; then
+              echo No Dockerfile found
+              exit 0
+            fi
+  
+            # Get the docker image to check
+            DOCKER_IMAGE=$(grep -o -Ei -m1 'FROM.*([^:]+):[0-9]+' Dockerfile | cut -d/ -f 2)
+
+            echo Resulted docker image: ${DOCKER_IMAGE}
+  
+            # Check if we even have image match, e.g "image_name:123"
+            if [[ -z $DOCKER_IMAGE ]]; then
+              echo Dockerfile is not based on upgradeable image tag
+              exit 0
+            fi
+  
+            DOCKER_IMAGE_NAME=$(echo $DOCKER_IMAGE | cut -d: -f1)
+            DOCKER_IMAGE_VERSION=$(echo $DOCKER_IMAGE | cut -d: -f2)
+  
+            echo Registry ID: ${REGISTRY_ID}
+  
+            # get latest image number, e.g. 492
+            LATEST_VERSION=$(aws ecr list-images --registry-id ${REGISTRY_ID} --repository-name ${DOCKER_IMAGE_NAME} --query 'imageIds[].imageTag' | grep -Eo '[0-9]+' | sort -nr | head -n 1) 
+  
+            echo Latest version is ${LATEST_VERSION}
+  
+            # Check if the $LATEST_VERSION is above the $DOCKER_IMAGE_VERSION
+            if [[ $LATEST_VERSION -eq $DOCKER_IMAGE_VERSION ]]; then
+              echo Latest version ${LATEST_VERSION} is already in use
+              exit 0
+            fi
+
+            echo Updating Dockerfile...
+
+            sed -i.bak "s/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION/$DOCKER_IMAGE_NAME:$LATEST_VERSION/g" Dockerfile
+            rm Dockerfile.bak
+
+            git config --global user.name $GITHUB_ACTOR
+            git config --global user.email $GITHUB_ACTOR@users.noreply.github.com
+
+            git add Dockerfile
+            git commit -m "Updated Dockerfile image tag"
+            git push -f origin dockerfile/${BRANCH}
+          
+            gh pr create --base ${BRANCH} --body "This is an automatic PR to upgrade Dockerfile to the latest tag" --title "[Dockerfile] Automatic upgrade" --label docker --label dependencies --label pr:auto-generated
+          done
