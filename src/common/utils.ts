@@ -79,23 +79,20 @@ export function deepClone<T>(obj: T): T {
   }
 
   if (obj instanceof Date) {
-    return new Date(obj.getTime()) as any;
+    return new Date(obj.getTime()) as T;
   }
 
   if (obj instanceof Array) {
-    const clonedArr: any[] = [];
-    obj.forEach((item) => {
-      clonedArr.push(deepClone(item));
-    });
-    return clonedArr as any;
+    const clonedArr = obj.map((item) => deepClone(item));
+    return clonedArr as T;
   }
 
   if (obj instanceof Object) {
-    const clonedObj: any = {};
+    const clonedObj: Record<string, unknown> = {};
     Object.keys(obj).forEach((key) => {
-      clonedObj[key] = deepClone((obj as any)[key]);
+      clonedObj[key] = deepClone((obj as Record<string, unknown>)[key]);
     });
-    return clonedObj;
+    return clonedObj as T;
   }
 
   return obj;
@@ -156,7 +153,7 @@ export async function retryWithBackoff<T>(
   maxRetries: number = 3,
   baseDelay: number = 1000
 ): Promise<T> {
-  let lastError: Error;
+  let lastError: Error | undefined;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -171,5 +168,5 @@ export async function retryWithBackoff<T>(
     }
   }
 
-  throw lastError!;
+  throw lastError || new Error('Function failed after retries');
 }
