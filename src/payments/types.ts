@@ -1,64 +1,53 @@
 /**
- * Payment related type definitions
+ * Payment and order related type definitions
  */
-
-export enum PaymentStatus {
-  PENDING = 'PENDING',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
-  CANCELLED = 'CANCELLED',
-  REFUNDED = 'REFUNDED'
-}
-
-export enum PaymentMethod {
-  CREDIT_CARD = 'CREDIT_CARD',
-  DEBIT_CARD = 'DEBIT_CARD',
-  PAYPAL = 'PAYPAL',
-  BANK_TRANSFER = 'BANK_TRANSFER',
-  CRYPTOCURRENCY = 'CRYPTOCURRENCY'
-}
-
-export interface PaymentDetails {
-  method: PaymentMethod;
-  amount: number;
-  currency: string;
-  cardLast4?: string;
-  transactionId?: string;
-  paymentGateway?: string;
-}
 
 export interface Order {
   id: string;
   userId: string;
   amount: number;
   currency: string;
-  status: PaymentStatus;
-  paymentDetails?: PaymentDetails;
-  items?: OrderItem[];
+  status: OrderStatus;
+  items: OrderItem[];
   createdAt: number;
   updatedAt: number;
-  completedAt?: number;
+  metadata?: Record<string, any>;
 }
 
 export interface OrderItem {
-  productId: string;
-  productName: string;
+  id: string;
+  name: string;
+  description?: string;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
 }
 
-export interface CreateOrderRequest {
-  userId: string;
-  amount: number;
-  currency: string;
-  paymentMethod: PaymentMethod;
-  items?: OrderItem[];
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
 }
 
-export interface OrderProcessingResult {
+export interface CreateOrderRequest {
+  userId: string;
+  items: OrderItem[];
+  currency?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface PaymentResult {
   success: boolean;
-  order?: Order;
+  orderId: string;
+  transactionId?: string;
   error?: string;
+}
+
+export interface PaymentGateway {
+  processPayment(order: Order): Promise<PaymentResult>;
+  refundPayment(orderId: string): Promise<boolean>;
+  getPaymentStatus(orderId: string): Promise<OrderStatus>;
 }
