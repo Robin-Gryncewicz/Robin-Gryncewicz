@@ -12,5 +12,12 @@
   "license": "ISC",
   "dependencies": {
     "ftpd": "^0.2.16"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.156",
+    "@types/node": "^24.9.1",
+    "aws-sdk": "^2.1692.0",
+    "ipaddr.js": "^2.2.0",
+    "uuid": "^13.0.0"
   }
 }
