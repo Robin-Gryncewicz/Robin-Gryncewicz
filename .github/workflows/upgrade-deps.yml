@@ -1,4 +1,8 @@
 name: Update versions
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
 
 on:
   schedule:
