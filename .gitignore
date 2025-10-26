@@ -290,6 +290,12 @@ FakesAssemblies/
 .ntvs_analysis.dat
 node_modules/
 
+# TypeScript build artifacts
+*.js
+*.d.ts
+!jest.config.js
+!*.config.js
+
 # Visual Studio 6 build log
 *.plg
 
