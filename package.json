@@ -11,6 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ftpd": "^0.2.16"
+    "ftpd": "^0.2.16",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "@types/uuid": "^10.0.0"
   }
 }
