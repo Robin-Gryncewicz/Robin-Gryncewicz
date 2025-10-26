@@ -18,10 +18,10 @@ jobs:
       FAST_USER: ${{ secrets.FAST_USER }}
       FAST_EMAIL: ${{ secrets.FAST_EMAIL }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           ref: infrastructure.cdk
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v6
         with:
           node-version: '18'
       - name: Check for updates and upgrade if possible
@@ -68,7 +68,7 @@ jobs:
           git commit -m "Bump aws-cdk-lib to ${{ env.LATEST_CDK }}"
           yarn version --minor
           git push -u origin $BRANCH_NAME
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v8
         if: ${{ steps.check-upgrade.outputs.UPGRADED == 1 }}
         with:
           script: |
