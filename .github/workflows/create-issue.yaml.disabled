@@ -1,3 +1,10 @@
+# This workflow has been disabled because it was creating an issue for every single push
+# to the repository without any clear purpose or automated resolution, which created
+# noise in the issue tracker.
+# 
+# If you need to re-enable this workflow, rename this file back to .yaml and ensure
+# there is a clear purpose and automated handling for the created issues.
+
 name: Create issue on commit
 
 on: [ push ]
