@@ -61,11 +61,17 @@ export function safeJsonParse<T>(jsonString: string): T | null {
 }
 
 /**
- * Deep clones an object
+ * Deep clones an object using structuredClone (if available) or JSON serialization as fallback
+ * Note: JSON serialization doesn't handle functions, undefined values, symbols, or circular references
  * @param obj Object to clone
  * @returns Cloned object
  */
 export function deepClone<T>(obj: T): T {
+  // Use structuredClone if available (modern environments)
+  if (typeof structuredClone !== 'undefined') {
+    return structuredClone(obj);
+  }
+  // Fallback to JSON serialization for compatibility
   return JSON.parse(JSON.stringify(obj));
 }
 
@@ -74,7 +80,7 @@ export function deepClone<T>(obj: T): T {
  * @param value Value to check
  * @returns Boolean indicating if the value is empty
  */
-export function isEmpty(value: any): boolean {
+export function isEmpty(value: unknown): boolean {
   if (value === null || value === undefined) {
     return true;
   }
