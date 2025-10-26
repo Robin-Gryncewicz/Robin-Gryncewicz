@@ -1,6 +1,14 @@
 name: Create issue on commit
 
-on: [ push ]
+# Disabled automatic triggering to prevent creating issues for every commit
+# This workflow can be manually triggered if needed
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Commit SHA to create issue for'
+        required: false
+        default: ''
 
 jobs:
   create_issue:
@@ -10,12 +18,16 @@ jobs:
     steps:
       - name: Create issue using REST API
         run: |
+          COMMIT_SHA="${{ github.event.inputs.commit_sha }}"
+          if [ -z "$COMMIT_SHA" ]; then
+            COMMIT_SHA="${{ github.sha }}"
+          fi
           curl --request POST \
           --url https://api.github.com/repos/${{ github.repository }}/issues \
           --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
           --header 'content-type: application/json' \
-          --data '{
-            "title": "Automated issue for commit: ${{ github.sha }}",
-            "body": "This issue was automatically created by the GitHub Action workflow **${{ github.workflow }}**. \n\n The commit hash was: _${{ github.sha }}_."
-            }' \
+          --data "{
+            \"title\": \"Automated issue for commit: $COMMIT_SHA\",
+            \"body\": \"This issue was manually created by the GitHub Action workflow **${{ github.workflow }}**. \\n\\n The commit hash was: _${COMMIT_SHA}_\"
+            }" \
           --fail
