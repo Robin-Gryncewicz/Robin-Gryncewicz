@@ -5,6 +5,8 @@ on: [ push ]
 jobs:
   create_issue:
     runs-on: ubuntu-latest
+    # Disabled to prevent spam issues from being created on every commit
+    if: false
     permissions:
       issues: write
     steps:
