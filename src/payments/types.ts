@@ -1,6 +1,27 @@
 /**
- * Payment related type definitions
+ * Payment and order related type definitions
  */
+
+export interface Order {
+  id: string;
+  userId: string;
+  amount: number;
+  currency: string;
+  status: OrderStatus;
+  items: OrderItem[];
+  createdAt: number;
+  updatedAt: number;
+  metadata?: Record<string, any>;
+}
+
+export interface OrderItem {
+  id: string;
+  name: string;
+  description?: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -8,45 +29,7 @@ export enum OrderStatus {
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
   CANCELLED = 'CANCELLED',
-  REFUNDED = 'REFUNDED'
-}
-
-export enum PaymentMethod {
-  CREDIT_CARD = 'CREDIT_CARD',
-  DEBIT_CARD = 'DEBIT_CARD',
-  PAYPAL = 'PAYPAL',
-  BANK_TRANSFER = 'BANK_TRANSFER',
-  CRYPTO = 'CRYPTO'
-}
-
-export interface OrderItem {
-  id: string;
-  productId: string;
-  productName: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-}
-
-export interface PaymentDetails {
-  method: PaymentMethod;
-  transactionId?: string;
-  paymentDate?: number;
-  amount: number;
-  currency: string;
-}
-
-export interface Order {
-  id: string;
-  userId: string;
-  items: OrderItem[];
-  status: OrderStatus;
-  totalAmount: number;
-  currency: string;
-  paymentDetails?: PaymentDetails;
-  createdAt: number;
-  updatedAt: number;
-  metadata?: Record<string, any>;
+  REFUNDED = 'REFUNDED',
 }
 
 export interface CreateOrderRequest {
@@ -56,8 +39,15 @@ export interface CreateOrderRequest {
   metadata?: Record<string, any>;
 }
 
-export interface OrderValidationResult {
-  valid: boolean;
-  order?: Order;
+export interface PaymentResult {
+  success: boolean;
+  orderId: string;
+  transactionId?: string;
   error?: string;
+}
+
+export interface PaymentGateway {
+  processPayment(order: Order): Promise<PaymentResult>;
+  refundPayment(orderId: string): Promise<boolean>;
+  getPaymentStatus(orderId: string): Promise<OrderStatus>;
 }

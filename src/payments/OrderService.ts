@@ -1,30 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
-import {
-  Order,
-  OrderItem,
-  OrderStatus,
-  CreateOrderRequest,
-  OrderValidationResult,
-  PaymentDetails,
-  PaymentMethod
-} from './types';
+import { Order, OrderStatus, CreateOrderRequest, OrderItem, PaymentGateway, PaymentResult } from './types';
 
 /**
- * OrderService - Handles payment order processing
+ * Service for handling payment order processing
  */
 export class OrderService {
   private _orders: Map<string, Order>;
-  private readonly _defaultCurrency: string;
-
-  /**
-   * Creates a new OrderService instance
-   * @param defaultCurrency Default currency for orders (default: 'USD')
-   */
-  constructor(defaultCurrency: string = 'USD') {
+  private _paymentGateway?: PaymentGateway;
+  
+  constructor(paymentGateway?: PaymentGateway) {
     this._orders = new Map<string, Order>();
-    this._defaultCurrency = defaultCurrency;
+    this._paymentGateway = paymentGateway;
   }
-
+  
   /**
    * Creates a new order
    * @param request The order creation request
@@ -32,227 +20,166 @@ export class OrderService {
    */
   public createOrder(request: CreateOrderRequest): Order {
     const now = Date.now();
-    const totalAmount = this.calculateTotalAmount(request.items);
-
+    const totalAmount = request.items.reduce((sum, item) => sum + item.totalPrice, 0);
+    
     const order: Order = {
       id: uuidv4(),
       userId: request.userId,
-      items: request.items,
+      amount: totalAmount,
+      currency: request.currency || 'USD',
       status: OrderStatus.PENDING,
-      totalAmount,
-      currency: request.currency || this._defaultCurrency,
+      items: request.items,
       createdAt: now,
       updatedAt: now,
       metadata: request.metadata
     };
-
+    
     this._orders.set(order.id, order);
     return order;
   }
-
+  
   /**
    * Retrieves an order by ID
-   * @param orderId The order ID to retrieve
+   * @param orderId The ID of the order to retrieve
    * @returns The order or undefined if not found
    */
   public getOrder(orderId: string): Order | undefined {
     return this._orders.get(orderId);
   }
-
+  
   /**
-   * Retrieves all orders for a user
-   * @param userId The user ID
+   * Retrieves all orders for a specific user
+   * @param userId The ID of the user
    * @returns Array of orders for the user
    */
   public getUserOrders(userId: string): Order[] {
     return Array.from(this._orders.values())
       .filter(order => order.userId === userId);
   }
-
+  
   /**
-   * Updates the status of an order
-   * @param orderId The order ID to update
-   * @param status The new status
-   * @returns The updated order or undefined if not found
+   * Processes payment for an order
+   * @param orderId The ID of the order to process
+   * @returns Payment result
    */
-  public updateOrderStatus(orderId: string, status: OrderStatus): Order | undefined {
+  public async processPayment(orderId: string): Promise<PaymentResult> {
     const order = this._orders.get(orderId);
     
     if (!order) {
-      return undefined;
+      return {
+        success: false,
+        orderId,
+        error: 'Order not found'
+      };
     }
-
+    
+    if (order.status !== OrderStatus.PENDING) {
+      return {
+        success: false,
+        orderId,
+        error: `Order cannot be processed in ${order.status} status`
+      };
+    }
+    
+    // Update order status to processing
+    this.updateOrderStatus(orderId, OrderStatus.PROCESSING);
+    
+    try {
+      if (!this._paymentGateway) {
+        throw new Error('Payment gateway not configured');
+      }
+      
+      const result = await this._paymentGateway.processPayment(order);
+      
+      if (result.success) {
+        this.updateOrderStatus(orderId, OrderStatus.COMPLETED);
+      } else {
+        this.updateOrderStatus(orderId, OrderStatus.FAILED);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      this.updateOrderStatus(orderId, OrderStatus.FAILED);
+      
+      return {
+        success: false,
+        orderId,
+        error: error instanceof Error ? error.message : 'Payment processing failed'
+      };
+    }
+  }
+  
+  /**
+   * Updates the status of an order
+   * @param orderId The ID of the order to update
+   * @param status The new status
+   * @returns Boolean indicating if the update was successful
+   */
+  public updateOrderStatus(orderId: string, status: OrderStatus): boolean {
+    const order = this._orders.get(orderId);
+    
+    if (!order) {
+      return false;
+    }
+    
     order.status = status;
     order.updatedAt = Date.now();
     this._orders.set(orderId, order);
-
-    return order;
+    
+    return true;
   }
-
-  /**
-   * Processes payment for an order
-   * @param orderId The order ID
-   * @param paymentDetails The payment details
-   * @returns A validation result indicating success or failure
-   */
-  public async processPayment(
-    orderId: string,
-    paymentDetails: PaymentDetails
-  ): Promise<OrderValidationResult> {
-    const order = this._orders.get(orderId);
-
-    if (!order) {
-      return { valid: false, error: 'Order not found' };
-    }
-
-    if (order.status !== OrderStatus.PENDING) {
-      return { valid: false, error: 'Order is not in pending status' };
-    }
-
-    if (paymentDetails.amount !== order.totalAmount) {
-      return { valid: false, error: 'Payment amount does not match order total' };
-    }
-
-    if (paymentDetails.currency !== order.currency) {
-      return { valid: false, error: 'Payment currency does not match order currency' };
-    }
-
-    try {
-      // Update order with payment details
-      order.paymentDetails = {
-        ...paymentDetails,
-        paymentDate: Date.now()
-      };
-      order.status = OrderStatus.PROCESSING;
-      order.updatedAt = Date.now();
-      this._orders.set(orderId, order);
-
-      // Simulate payment processing
-      // In a real implementation, this would integrate with a payment gateway
-      await this.simulatePaymentProcessing();
-
-      // Mark as completed
-      order.status = OrderStatus.COMPLETED;
-      order.updatedAt = Date.now();
-      this._orders.set(orderId, order);
-
-      return { valid: true, order };
-    } catch (error) {
-      // Mark as failed
-      order.status = OrderStatus.FAILED;
-      order.updatedAt = Date.now();
-      this._orders.set(orderId, order);
-
-      return { valid: false, error: 'Payment processing failed' };
-    }
-  }
-
+  
   /**
    * Cancels an order
-   * @param orderId The order ID to cancel
-   * @returns A boolean indicating if the cancellation was successful
+   * @param orderId The ID of the order to cancel
+   * @returns Boolean indicating if the cancellation was successful
    */
   public cancelOrder(orderId: string): boolean {
     const order = this._orders.get(orderId);
-
+    
     if (!order) {
       return false;
     }
-
+    
     if (order.status === OrderStatus.COMPLETED || order.status === OrderStatus.REFUNDED) {
       return false;
     }
-
-    order.status = OrderStatus.CANCELLED;
-    order.updatedAt = Date.now();
-    this._orders.set(orderId, order);
-
-    return true;
+    
+    return this.updateOrderStatus(orderId, OrderStatus.CANCELLED);
   }
-
+  
   /**
    * Refunds an order
-   * @param orderId The order ID to refund
-   * @returns A validation result indicating success or failure
+   * @param orderId The ID of the order to refund
+   * @returns Boolean indicating if the refund was successful
    */
-  public async refundOrder(orderId: string): Promise<OrderValidationResult> {
+  public async refundOrder(orderId: string): Promise<boolean> {
     const order = this._orders.get(orderId);
-
+    
     if (!order) {
-      return { valid: false, error: 'Order not found' };
+      return false;
     }
-
+    
     if (order.status !== OrderStatus.COMPLETED) {
-      return { valid: false, error: 'Only completed orders can be refunded' };
+      return false;
     }
-
-    if (!order.paymentDetails) {
-      return { valid: false, error: 'No payment details found for refund' };
-    }
-
+    
     try {
-      // Simulate refund processing
-      await this.simulateRefundProcessing();
-
-      order.status = OrderStatus.REFUNDED;
-      order.updatedAt = Date.now();
-      this._orders.set(orderId, order);
-
-      return { valid: true, order };
+      if (!this._paymentGateway) {
+        throw new Error('Payment gateway not configured');
+      }
+      
+      const refunded = await this._paymentGateway.refundPayment(orderId);
+      
+      if (refunded) {
+        this.updateOrderStatus(orderId, OrderStatus.REFUNDED);
+      }
+      
+      return refunded;
     } catch (error) {
-      return { valid: false, error: 'Refund processing failed' };
+      console.error('Refund processing error:', error);
+      return false;
     }
-  }
-
-  /**
-   * Validates an order
-   * @param orderId The order ID to validate
-   * @returns A validation result
-   */
-  public validateOrder(orderId: string): OrderValidationResult {
-    const order = this._orders.get(orderId);
-
-    if (!order) {
-      return { valid: false, error: 'Order not found' };
-    }
-
-    if (order.items.length === 0) {
-      return { valid: false, error: 'Order has no items' };
-    }
-
-    if (order.totalAmount <= 0) {
-      return { valid: false, error: 'Invalid order total amount' };
-    }
-
-    return { valid: true, order };
-  }
-
-  /**
-   * Calculates the total amount for order items
-   * @param items The order items
-   * @returns The total amount
-   */
-  private calculateTotalAmount(items: OrderItem[]): number {
-    return items.reduce((total, item) => total + item.totalPrice, 0);
-  }
-
-  /**
-   * Simulates payment processing (for demonstration purposes)
-   * In a real implementation, this would integrate with a payment gateway
-   */
-  private async simulatePaymentProcessing(): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(resolve, 100);
-    });
-  }
-
-  /**
-   * Simulates refund processing (for demonstration purposes)
-   * In a real implementation, this would integrate with a payment gateway
-   */
-  private async simulateRefundProcessing(): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(resolve, 100);
-    });
   }
 }
