@@ -99,14 +99,17 @@ export class OrderService {
     order.status = status;
     order.updatedAt = Date.now();
 
-    if (paymentDetails && order.paymentDetails) {
-      order.paymentDetails = {
-        ...order.paymentDetails,
-        ...paymentDetails
-      };
-    } else if (paymentDetails) {
-      // If paymentDetails doesn't exist yet, create it
-      order.paymentDetails = paymentDetails as PaymentDetails;
+    if (paymentDetails) {
+      if (order.paymentDetails) {
+        // Merge with existing payment details
+        order.paymentDetails = {
+          ...order.paymentDetails,
+          ...paymentDetails
+        };
+      } else if (this.isValidPaymentDetails(paymentDetails)) {
+        // Only set if all required fields are present
+        order.paymentDetails = paymentDetails as PaymentDetails;
+      }
     }
 
     if (status === PaymentStatus.COMPLETED) {
@@ -115,6 +118,15 @@ export class OrderService {
 
     this._orders.set(orderId, order);
     return true;
+  }
+
+  /**
+   * Validates that payment details have all required fields
+   * @param details Partial payment details to validate
+   * @returns True if all required fields are present
+   */
+  private isValidPaymentDetails(details: Partial<PaymentDetails>): details is PaymentDetails {
+    return !!(details.method && details.amount !== undefined && details.currency);
   }
 
   /**

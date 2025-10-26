@@ -60,11 +60,11 @@ export function delay(ms: number): Promise<void> {
 
 /**
  * Deep clones an object
- * Note: This uses JSON serialization which has limitations:
+ * Note: This implementation handles common cases including Date objects and nested structures.
+ * Limitations:
  * - Does not preserve functions, undefined values, or symbols
- * - Does not preserve Date objects (converts to strings)
  * - Does not handle circular references
- * For complex objects, consider using a dedicated library like lodash.cloneDeep
+ * For complex objects with circular references, consider using a dedicated library like lodash.cloneDeep
  * @param obj The object to clone
  * @returns A deep clone of the object
  */
@@ -83,7 +83,7 @@ export function deepClone<T>(obj: T): T {
   
   const clonedObj = {} as T;
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       clonedObj[key] = deepClone(obj[key]);
     }
   }
