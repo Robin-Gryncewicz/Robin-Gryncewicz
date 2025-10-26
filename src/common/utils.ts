@@ -18,11 +18,14 @@ export function generateRandomString(length: number): string {
 
 /**
  * Validates an email address format
+ * Note: This is a basic validation. For production use, consider a more robust solution
+ * or a dedicated email validation library
  * @param email The email address to validate
  * @returns True if the email is valid, false otherwise
  */
 export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Basic RFC 5322 compliant email validation
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   return emailRegex.test(email);
 }
 
@@ -57,11 +60,35 @@ export function delay(ms: number): Promise<void> {
 
 /**
  * Deep clones an object
+ * Note: This uses JSON serialization which has limitations:
+ * - Does not preserve functions, undefined values, or symbols
+ * - Does not preserve Date objects (converts to strings)
+ * - Does not handle circular references
+ * For complex objects, consider using a dedicated library like lodash.cloneDeep
  * @param obj The object to clone
  * @returns A deep clone of the object
  */
 export function deepClone<T>(obj: T): T {
-  return JSON.parse(JSON.stringify(obj));
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  
+  if (obj instanceof Date) {
+    return new Date(obj.getTime()) as T;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => deepClone(item)) as T;
+  }
+  
+  const clonedObj = {} as T;
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      clonedObj[key] = deepClone(obj[key]);
+    }
+  }
+  
+  return clonedObj;
 }
 
 /**

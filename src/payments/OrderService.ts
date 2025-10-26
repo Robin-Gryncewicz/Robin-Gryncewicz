@@ -99,11 +99,14 @@ export class OrderService {
     order.status = status;
     order.updatedAt = Date.now();
 
-    if (paymentDetails) {
+    if (paymentDetails && order.paymentDetails) {
       order.paymentDetails = {
-        ...order.paymentDetails!,
+        ...order.paymentDetails,
         ...paymentDetails
       };
+    } else if (paymentDetails) {
+      // If paymentDetails doesn't exist yet, create it
+      order.paymentDetails = paymentDetails as PaymentDetails;
     }
 
     if (status === PaymentStatus.COMPLETED) {
