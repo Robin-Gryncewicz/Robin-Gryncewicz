@@ -13,17 +13,25 @@ Who am I
 
 ## GitHub Achievements
 
+![Achievements](https://img.shields.io/badge/GitHub-Achievements-blue?style=for-the-badge&logo=github)
+![Quick Start](https://img.shields.io/badge/Quick%20Start-3%2B%20Today-success?style=for-the-badge)
+![Documentation](https://img.shields.io/badge/Documentation-Complete-informational?style=for-the-badge)
+
 Want to unlock more GitHub achievements? **[Start here with our complete resource hub](ACHIEVEMENTS_README.md)** 📖
 
 ### Quick Links:
 
 **🚀 [Quick Start Guide](ACHIEVEMENT_QUICK_START.md)** - Unlock 3+ achievements TODAY!
+> *Fast track to YOLO, Quickdraw, and Pull Shark achievements*
 
 **📚 [Complete Guide](GITHUB_ACHIEVEMENTS_GUIDE.md)** - Comprehensive reference with all achievements
+> *All 7 unlockable achievements with strategies and tier requirements*
 
 **✅ [Achievement Checklist](ACHIEVEMENT_CHECKLIST.md)** - Track your progress systematically
+> *Personal tracker with weekly/monthly goals and project ideas*
 
 **🎯 [View Your Achievements](https://github.com/Robin-Gryncewicz?tab=achievements)** - See your current achievements
+> *Live view of your GitHub profile achievements*
 
 ### What You'll Learn:
 - How to unlock achievements in under 1 hour

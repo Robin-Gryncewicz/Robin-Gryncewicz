@@ -1,6 +1,20 @@
 # GitHub Achievements Guide
 
+![Complete Guide](https://img.shields.io/badge/Guide-Complete-success?style=for-the-badge)
+![Achievements](https://img.shields.io/badge/Achievements-7-blue?style=for-the-badge)
+![Tiers](https://img.shields.io/badge/Tiers-Bronze%20%7C%20Silver%20%7C%20Gold-orange?style=for-the-badge)
+
 This guide provides comprehensive information on how to unlock GitHub profile achievements. Achievements are special badges that showcase your activities, milestones, and contributions on GitHub.
+
+## 🗺️ Achievement Roadmap
+
+```
+Easy (Minutes)          Medium (Days-Weeks)       Hard (Weeks-Months)
+─────────────────      ───────────────────       ───────────────────
+🎲 YOLO                👥 Pair Extraordinaire     ⭐ Starstruck
+⚡ Quickdraw            🧠 Galaxy Brain            🦈 Pull Shark (Gold)
+🦈 Pull Shark (Bronze) 💝 Public Sponsor          
+```
 
 ## Table of Contents
 - [What Are GitHub Achievements?](#what-are-github-achievements)

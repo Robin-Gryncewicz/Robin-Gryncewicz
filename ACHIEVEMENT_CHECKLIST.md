@@ -1,6 +1,11 @@
 # GitHub Achievements Checklist
 
+![Checklist](https://img.shields.io/badge/Checklist-Personal%20Tracker-purple?style=for-the-badge)
+![Progress](https://img.shields.io/badge/Track-Your%20Progress-green?style=for-the-badge)
+
 Use this checklist to track your progress toward unlocking all GitHub achievements. Copy this to your own notes or issues to monitor your journey!
+
+> 📝 **Pro Tip**: Copy this checklist to a GitHub Issue in your profile repository to track progress publicly!
 
 ## 🎯 Current Achievement Status
 

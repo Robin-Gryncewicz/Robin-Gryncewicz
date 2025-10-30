@@ -1,6 +1,12 @@
 # GitHub Achievements - Complete Resource Hub
 
+![GitHub Achievements](https://img.shields.io/badge/GitHub-Achievements%20Hub-blue?style=for-the-badge&logo=github)
+![Guides](https://img.shields.io/badge/Guides-4-informational?style=for-the-badge)
+![Quick Start](https://img.shields.io/badge/Quick%20Wins-3%2B-success?style=for-the-badge)
+
 Welcome to the GitHub Achievements Resource Hub! This collection of guides will help you understand, unlock, and track GitHub profile achievements.
+
+> 🎯 **Goal**: Help you unlock multiple GitHub achievements and enhance your developer profile!
 
 ## 📖 Available Resources
 
@@ -47,7 +53,7 @@ Welcome to the GitHub Achievements Resource Hub! This collection of guides will 
 
 ---
 
-### 4. 🤖 [Workflow Helper Example](.github/workflows/achievement-helper.yml.example)
+### 4. 🤖 [Workflow Helper](.github/workflows/achievement-helper.yml) ✨ ACTIVE
 **Best for**: Automation enthusiasts
 
 **What's inside**:
