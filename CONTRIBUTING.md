@@ -40,6 +40,82 @@ GitHub provides additional document on [forking a repository](https://help.githu
 [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
 
+## Using AI Tools and GitHub Copilot
+
+We welcome the use of AI-assisted development tools like GitHub Copilot to help with contributions. However, contributors must follow these guidelines:
+
+### Requirements for AI-Assisted Contributions
+
+1. **Human Review is Mandatory**:
+   - You must thoroughly review and understand all AI-generated code before submitting
+   - You are responsible for the quality, correctness, and security of your contributions
+   - Be prepared to explain and defend any code you submit, regardless of how it was generated
+
+2. **Testing is Required**:
+   - All AI-generated code must include appropriate tests
+   - Verify that existing tests still pass
+   - Add new tests to cover edge cases and potential issues
+
+3. **Declare AI Usage in PRs**:
+   - Use the AI/Tooling disclosure section in the pull request template
+   - Check the box indicating that AI tools were used
+   - Briefly describe how AI assisted (e.g., "code generation", "refactoring", "test creation")
+   - Add the `ai-assisted` label to your PR when AI tools contributed significantly
+
+4. **Security Considerations**:
+   - Never commit secrets, API keys, or sensitive information suggested by AI tools
+   - Carefully review any security-related code (authentication, authorization, data validation)
+   - Verify that dependencies suggested by AI are trustworthy and maintained
+   - Run security checks before submitting
+
+5. **Licensing Compliance**:
+   - Ensure all AI-generated code complies with this repository's license
+   - Review suggestions for originality and modify them to be transformative
+   - Don't blindly accept large code blocks without understanding and modifying them
+   - See the [LICENSE](LICENSE) file for our project's licensing terms
+
+6. **Code Quality Standards**:
+   - AI-generated code must follow the project's coding standards
+   - Run linting and type checks: `npm run typecheck`
+   - Ensure the code builds successfully: `npm run build`
+   - Follow the patterns and conventions used in the existing codebase
+
+### Labeling AI-Assisted PRs
+
+When GitHub Copilot or other AI tools significantly contributed to your pull request:
+
+1. Add the `ai-assisted` label to the PR
+2. Use this label when:
+   - AI generated substantial portions of the code
+   - AI was used for complex logic or algorithms
+   - Multiple files were created or modified with AI assistance
+3. Don't use this label for minor AI suggestions (e.g., simple autocomplete)
+
+### Getting Started with GitHub Copilot
+
+If you want to use GitHub Copilot while contributing:
+- Review the [COPILOT-SETUP.md](COPILOT-SETUP.md) guide for setup instructions
+- Follow the best practices outlined in that document
+- Join the conversation if you have questions about AI-assisted development
+
+### Example PR Description with AI Disclosure
+
+```markdown
+## Description
+Added email validation with domain verification feature.
+
+## AI/Tooling Disclosure
+- [x] AI tools were used to assist with this contribution
+- How: GitHub Copilot generated initial validation regex patterns and test cases.
+  I reviewed and modified the patterns to match our requirements and added 
+  additional edge case tests.
+
+Labels: ai-assisted
+```
+
+Remember: AI tools are aids to enhance your productivity, not replacements for understanding and craftsmanship. You own every line of code you submit.
+
+
 ## Finding contributions to work on
 Looking at the existing issues is a great way to find something to contribute on. As our projects, by default, use the default GitHub issue labels (enhancement/bug/duplicate/help wanted/invalid/question/wontfix), looking at any 'help wanted' issues is a great place to start.
 
