@@ -1,0 +1,122 @@
+name: Achievement Helper
+
+# This is an EXAMPLE workflow to demonstrate how automation can help with achievements
+# To use this, rename to achievement-helper.yml and customize as needed
+# 
+# Note: This workflow is for demonstration purposes. Some achievements like YOLO
+# should be earned through genuine development practices, not automation.
+
+on:
+  workflow_dispatch: # Allows manual triggering
+  # You can add other triggers as needed
+
+jobs:
+  achievement-tips:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Display Achievement Progress Tips
+        run: |
+          echo "🏆 GitHub Achievement Helper"
+          echo "=============================="
+          echo ""
+          echo "This workflow demonstrates how to track your achievement progress."
+          echo ""
+          echo "Current repository statistics:"
+          echo "- Repository: ${{ github.repository }}"
+          echo "- Branch: ${{ github.ref_name }}"
+          echo ""
+          echo "📚 Achievement Guides Available:"
+          echo "- Quick Start: ACHIEVEMENT_QUICK_START.md"
+          echo "- Complete Guide: GITHUB_ACHIEVEMENTS_GUIDE.md"
+          echo ""
+          echo "🎯 Achievements you can work on:"
+          echo "1. Pull Shark - Merge pull requests (current PR counts toward this!)"
+          echo "2. Pair Extraordinaire - Use co-authored commits"
+          echo "3. YOLO - Merge PRs without review (use wisely!)"
+          echo "4. Galaxy Brain - Answer questions in GitHub Discussions"
+          echo ""
+          echo "Visit: https://github.com/${{ github.repository_owner }}?tab=achievements"
+
+  check-pr-for-achievements:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for Co-authors (Pair Extraordinaire)
+        run: |
+          echo "Checking for co-authored commits..."
+          git log --format='%B' -n 1 ${{ github.sha }} | grep -i "co-authored-by" && \
+          echo "✅ Co-authored commit found! This helps with Pair Extraordinaire achievement." || \
+          echo "ℹ️ No co-authors found. Add 'Co-authored-by: Name <email>' to commit messages."
+
+      - name: Achievement Progress Comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const message = `
+            🏆 **Achievement Tracking**
+            
+            This PR can contribute to the following achievements:
+            - **Pull Shark** 🦈: Merging this PR counts toward Pull Shark tiers
+            - **Quickdraw** ⚡: If this PR closes an issue within 5 minutes
+            - **YOLO** 🎲: If merged without review (not recommended for important changes)
+            
+            Check co-authored commits for **Pair Extraordinaire** 👥
+            
+            [View your achievements](https://github.com/${{ github.repository_owner }}?tab=achievements)
+            `;
+            
+            // This would post a comment on the PR
+            // Uncomment to enable:
+            // github.rest.issues.createComment({
+            //   issue_number: context.issue.number,
+            //   owner: context.repo.owner,
+            //   repo: context.repo.repo,
+            //   body: message
+            // });
+            
+            console.log(message);
+
+  achievement-reminder:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Remind about achievements
+        run: |
+          echo "🎯 Quick Achievement Checklist:"
+          echo ""
+          echo "✅ YOLO - Merge a PR without review"
+          echo "✅ Quickdraw - Close issue/PR within 5 minutes of opening"
+          echo "✅ Pull Shark Bronze - Merge 2 PRs"
+          echo "✅ Pair Extraordinaire - Co-author commits"
+          echo "✅ Galaxy Brain - Get answers accepted in Discussions"
+          echo "✅ Public Sponsor - Sponsor a developer/project"
+          echo ""
+          echo "📖 Read the full guides:"
+          echo "   - ACHIEVEMENT_QUICK_START.md"
+          echo "   - GITHUB_ACHIEVEMENTS_GUIDE.md"
+
+# Additional example jobs that could be added:
+
+  # Example: Auto-label PRs to help with organization
+  # auto-label:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request'
+  #   steps:
+  #     - uses: actions/labeler@v5
+
+  # Example: Welcome new contributors
+  # welcome:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request' && github.event.action == 'opened'
+  #   steps:
+  #     - uses: actions/first-interaction@v1
+  #       with:
+  #         repo-token: ${{ secrets.GITHUB_TOKEN }}
+  #         pr-message: 'Thanks for your contribution! This PR helps with the Pull Shark achievement! 🦈'
