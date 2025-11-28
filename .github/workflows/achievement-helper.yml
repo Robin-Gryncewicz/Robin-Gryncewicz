@@ -1,4 +1,6 @@
 name: Achievement Helper
+permissions:
+  contents: read
 
 # This is an EXAMPLE workflow to demonstrate how automation can help with achievements
 # To use this, rename to achievement-helper.yml and customize as needed
