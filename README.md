@@ -43,5 +43,25 @@ Want to unlock more GitHub achievements? **[Start here with our complete resourc
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request for improvements or suggestions.
 
+## Development
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run tests
+
+```bash
+npm test
+```
+
+### Run type checks
+
+```bash
+npm run typecheck
+```
+
 ## License
 This project is licensed under the MIT License.
