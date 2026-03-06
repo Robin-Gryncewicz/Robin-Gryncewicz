@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SellerId Fix Preview</title>
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #4b5563;
+      --accent: #0b57d0;
+      --ok: #0f9d58;
+      --warn: #b26a00;
+      --border: #e5e7eb;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, #f8fafc 0%, #f3f6fb 100%);
+      color: var(--ink);
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .hero {
+      background: radial-gradient(1200px 200px at top left, #e8f0fe 0%, #ffffff 70%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .hero h1 { margin: 0 0 8px 0; font-size: 28px; }
+    .hero p { margin: 6px 0; color: var(--muted); }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    h2 { margin: 0 0 12px 0; font-size: 20px; }
+    h3 { margin: 0 0 10px 0; font-size: 16px; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 5px; }
+    ul { margin: 8px 0 0 20px; }
+    li { margin: 6px 0; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .status { font-weight: 600; }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .img {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .img img { width: 100%; display: block; }
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>SellerId Fix Preview</h1>
+      <p>This page summarizes the confirmed root cause, proposed/implemented fix, and current verification status.</p>
+      <p class="small">Generated on: <strong>2026-02-27 01:37:40 +01:00</strong></p>
+    </section>
+
+    <section class="card">
+      <h2>Confirmed Root Cause</h2>
+      <ul>
+        <li><code>listing-contact/app/contactdata/UpsResponseParser.scala:29</code> sets <code>SellId = None</code> for UPS/private path.</li>
+        <li><code>listing-contact/app/models/ArticleDetailsFromListingFactory.scala:44</code> drops <code>0</code> via <code>SellId.filter(_ != 0)</code>.</li>
+        <li><code>listing-contact/app/serialization/MessageBagXmlSerializer.scala:90</code> serializes missing value as empty <code>&lt;sellid/&gt;</code>.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Proposed and Implemented Fix (Local)</h2>
+      <ul>
+        <li>Add request-level sellId ingestion in <code>ContactResource</code> decoder for both keys: <code>sellId</code> and <code>sellerId</code>.</li>
+        <li>Propagate validated request sellId into <code>ContactResource</code> (excluding <code>0</code>).</li>
+        <li>In <code>MessageModelFactory</code>, resolve seller id with fallback:<br/><code>customerInfo.sellId.orElse(contactResource.sellId)</code>.</li>
+      </ul>
+      <p class="small muted">Behavior preserved: existing customer-info sellId remains preferred when present.</p>
+    </section>
+
+    <section class="card">
+      <h2>Flow Diagram</h2>
+      <div class="img">
+        <img src="sellerid-fix-flow.png" alt="SellerId fix flow diagram" />
+      </div>
+      <p class="small"><a href="sellerid-fix-flow.svg">Open SVG</a></p>
+    </section>
+
+    <section class="card">
+      <h2>Sequence Diagram</h2>
+      <div class="img">
+        <img src="sellerid-fix-sequence.png" alt="SellerId fix sequence diagram" />
+      </div>
+      <p class="small"><a href="sellerid-fix-sequence.svg">Open SVG</a></p>
+    </section>
+
+    <section class="card">
+      <h2>Test Results</h2>
+      <h3>Executed</h3>
+      <ul>
+        <li><code>sbt compile</code> with Corretto 21: <span class="status ok">PASS</span>.</li>
+        <li><code>sbt "runMain tools.SellIdFixSmokeTest"</code>: <span class="status ok">PASS</span>.
+          <ul>
+            <li>decoder maps <code>sellId</code> -> <code>RequestContactResource.SellId</code></li>
+            <li>decoder maps <code>sellerId</code> alias -> <code>RequestContactResource.SellId</code></li>
+            <li>message model uses request sellId fallback when customer-info sellId is missing</li>
+            <li>customer-info sellId remains preferred when both are present</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>Known Limitation</h3>
+      <ul>
+        <li><code>sbt "testOnly ..."</code> currently fails on pre-existing unrelated test-suite Java 21 deprecation errors (<code>new Locale(...)</code> in many legacy tests).</li>
+      </ul>
+      <ul>
+        <li>Read-only AWS replay for listing-contact target queues is currently blocked by resource policy access (current SSO identity has no access to queue accounts <code>184239733463</code> and <code>717037947466</code>).</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Template Hardening Check (This Repo)</h2>
+      <p>All local templates in this repository currently contain sellerId in the relevant <code>&lt;lead&gt;&lt;vehicle&gt;</code> blocks:</p>
+      <ul>
+        <li><code>templates/gwp/fr-BE/contactForDealer.xml</code> (2 occurrences)</li>
+        <li><code>templates/gwp/fr-BE/ContactForDealerResponsive.xml</code> (1 occurrence)</li>
+        <li><code>templates/gwp/nl-BE/contactForDealer.xml</code> (2 occurrences)</li>
+        <li><code>templates/gwp/nl-BE/ContactForDealerResponsive.xml</code> (1 occurrence)</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Can We Be Sure It Works?</h2>
+      <p>Current confidence is <strong>high for the fix path itself</strong> (compile + direct smoke checks pass), but not yet full-regression certainty due unrelated repository test-suite blockers.</p>
+      <p>For production-level certainty, next validation is a read-only offline run on real AWS flows with fixed code deployed to a non-destructive test path.</p>
+      <p class="small"><a href="README.md">Detailed technical report</a></p>
+    </section>
+  </div>
+</body>
+</html>
